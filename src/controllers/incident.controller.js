@@ -33,3 +33,21 @@ exports.getAllIncidents = async (req, res) => {
             res.status(500).json({message: error.message});
         }
 };
+
+// Buscar un incidente por su ticket_number 
+exports.getIncidentByTicket = async (req, res) => {
+    try{
+        const {ticket_number} = req.params; // Extraer parametro de la URL
+
+        const incident = await Incident.findOne({
+            where: {ticket_number: ticket_number}
+        });
+
+        if (!incident){
+            return res.status(404).json({ message: 'Incidente no encontrado'});
+        }
+        res.status(200).json(incident);
+    } catch (error){
+        res.status(500).json({message: error.message})
+    }
+}
