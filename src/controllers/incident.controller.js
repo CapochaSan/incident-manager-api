@@ -1,4 +1,5 @@
 const Incident = require('../models/incident.model')
+const {op} = require('sequelize'); // Importación de operadores de Sequelize
 
 // Crear un nuevo incidente 
 exports.createIncident = async (req, res) => {
@@ -27,7 +28,23 @@ exports.createIncident = async (req, res) => {
 // Obtener todos los incidentes (Para el dash de monitoreo)}
 exports.getAllIncidents = async (req, res) => {
     try{
-        const incidents = await Incident.findAll();
+        const {severity, status} = req.query; // Extraer el filtro de la URL
+        let whereClause = {};
+
+        // Si el usuario mandó severidad, aplicamos el filtro:
+        if (severity){
+            whereClause.severity = severity
+        }
+
+        // Si el usuario mandó estado, aplicamos el filtro:
+        if (status){
+            whereClause.status = status
+        }
+        const incidents = await Incident.findAll({
+            where: whereClause,
+            order: [['createdAt', 'DESC']] // Los más recientes primeros (SRE Best Practise)
+        });
+        
         res.status(200).json(incidents);
         } catch (error){
             res.status(500).json({message: error.message});
