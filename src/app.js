@@ -1,15 +1,20 @@
 const express = require('express');
-const sequelize = require('./config/db.js');
-const Incident = require('./models/incident.model'); // Importamos el modelo que creamos antes
-const incidentRoutes = require('./routes/incident.routes.js');
+const {sequelize} = require('./models/index');
+const incidentRoutes = require('./routes/incident.routes')
 
 const app = express();
 app.use(express.json());
 
+// RUTAS:
+app.use('/api/incidents', incidentRoutes);
+
 // Sincronizar BD
 // 'force: false' evita que se borren los datos cada vez que reiniciamos
 sequelize.sync({force:false})
-    .then(() => console.log('Conexión a SQL Server exitosa y tablas sincronizadas'))
+    .then(() => {
+        console.log('Conexión a SQL Server exitosa y tablas sincronizadas')
+        app.listen(process.env.PORT, () => console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`));
+    })
     .catch(err => console.error('Error al conectar la DB: ', err))
 
 app.get('/api/health', (req, res) => {
@@ -20,7 +25,6 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-app.use('/api/incidents', incidentRoutes);
 
 app.listen(process.env.PORT, () =>  {
     console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);

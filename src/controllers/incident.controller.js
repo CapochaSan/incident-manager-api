@@ -1,4 +1,4 @@
-const Incident = require('../models/incident.model')
+const {Incident, WorkNote} = require('../models/index')
 const {op} = require('sequelize'); // Importación de operadores de Sequelize
 
 // Crear un nuevo incidente 
@@ -42,11 +42,17 @@ exports.getAllIncidents = async (req, res) => {
         }
         const incidents = await Incident.findAll({
             where: whereClause,
-            order: [['createdAt', 'DESC']] // Los más recientes primeros (SRE Best Practise)
+            order: [['createdAt', 'DESC']], // Los más recientes primeros (SRE Best Practise)
+            include: ['workNotes'] // Esto para probar si así incluye las notas al getAll
         });
-        
+
         res.status(200).json(incidents);
         } catch (error){
+            // Si el error es de validación del Sequelize
+            if (error.name === 'SequelizeValidationError'){
+                const messages = error.errors.map(e => e.message);
+                return res.status(400).json({ errors: messages });
+            }
             res.status(500).json({message: error.message});
         }
 };
@@ -57,7 +63,11 @@ exports.getIncidentByTicket = async (req, res) => {
         const {ticket_number} = req.params; // Extraer parametro de la URL
 
         const incident = await Incident.findOne({
-            where: {ticket_number: ticket_number}
+            where: {ticket_number},
+            include: [{
+                model: WorkNote,
+                as: 'workNotes' // Debe coincidir con el "as" definido en la relación
+            }]
         });
 
         if (!incident){
@@ -68,3 +78,40 @@ exports.getIncidentByTicket = async (req, res) => {
         res.status(500).json({message: error.message})
     }
 }
+
+// Actualizar estado o severidad de un incidente
+exports.updateIncident = async (req,res) => {
+    try{
+        const{ ticket_number} = req.params;
+        const{ severity, status, work_note} = req.body
+
+        // Primer paso: Buscar el incidente.
+        const incident = await Incident.findOne({where: {ticket_number} });
+
+        if (!incident) return res.status(404).json({message: 'Incidente no encontrado'});
+
+        // Usamos .update() en vez de .save() por consistencia, y para ejecutar validaciones
+        await incident.update({ status, severity},{
+            validate:true //esto fuerza a que se corran las validaciones del incident.model de parte del sequelize
+        });
+
+        // Si se escribió una nota, la guardamos asociada al incidente:
+        if (work_note){
+            await WorkNote.create({
+                note: work_note,
+                incidentId: incident.id
+            });
+        }
+
+        res.status(200).json({
+            message: `Incidente ${ticket_number} actualizado con éxito`,
+            data: incident
+        });
+    } catch (error){
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const message = error.errors.map(e => e.message);
+            return res.status(400).json({ errors: message});
+        }
+        res.status(500).json({ error: error.message});
+    }
+};
