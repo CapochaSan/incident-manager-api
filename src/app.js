@@ -1,12 +1,14 @@
 const express = require('express');
 const {sequelize} = require('./models/index');
 const incidentRoutes = require('./routes/incident.routes')
+const authRoutes = require('./routes/auth.routes')
 
 const app = express();
 app.use(express.json());
 
 // RUTAS:
 app.use('/api/incidents', incidentRoutes);
+app.use('/api/auth', authRoutes);
 
 // Sincronizar BD
 // 'force: false' evita que se borren los datos cada vez que reiniciamos
@@ -24,7 +26,6 @@ app.get('/api/health', (req, res) => {
         message: 'Incident management API is running'
     });
 });
-
 
 app.listen(process.env.PORT, () =>  {
     console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);

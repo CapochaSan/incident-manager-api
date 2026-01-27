@@ -1,4 +1,4 @@
-const {Incident, WorkNote} = require('../models/index')
+const {Incident, WorkNote, User} = require('../models/index')
 const {op} = require('sequelize'); // Importación de operadores de Sequelize
 
 // Crear un nuevo incidente 
@@ -28,22 +28,33 @@ exports.createIncident = async (req, res) => {
 // Obtener todos los incidentes (Para el dash de monitoreo)}
 exports.getAllIncidents = async (req, res) => {
     try{
-        const {severity, status} = req.query; // Extraer el filtro de la URL
-        let whereClause = {};
-
+        const {severity, status, username} = req.query; // Extraer los filtros de la URL
+        const whereClause = {};
+        
         // Si el usuario mandó severidad, aplicamos el filtro:
-        if (severity){
-            whereClause.severity = severity
-        }
-
+        if (severity){ whereClause.severity = severity};
         // Si el usuario mandó estado, aplicamos el filtro:
-        if (status){
-            whereClause.status = status
-        }
+        if (status){ whereClause.status = status};
+
+        let includeCondition = [{
+                model: WorkNote,
+                as: 'workNotes',
+                // Si viene username, forzamos el INNER JOIN con required
+                required: username ? true : false,
+                include: [{ model: User,
+                            attributes: ['username'],
+                            // Si un usuario pasa ?username -> filtramos user dentro de la WorkNote
+                            // Los puntos suspensivos son para agregar un parámetro adicional
+                            // significa que si username existe, entonces se inyecta el param where: {...}
+                            ...(username && { where: {username: username}})
+                }]
+            }];
+        
+        // Ejecución de la consulta:
         const incidents = await Incident.findAll({
             where: whereClause,
             order: [['createdAt', 'DESC']], // Los más recientes primeros (SRE Best Practise)
-            include: ['workNotes'] // Esto para probar si así incluye las notas al getAll
+            include: includeCondition
         });
 
         res.status(200).json(incidents);
@@ -66,7 +77,11 @@ exports.getIncidentByTicket = async (req, res) => {
             where: {ticket_number},
             include: [{
                 model: WorkNote,
-                as: 'workNotes' // Debe coincidir con el "as" definido en la relación
+                as: 'workNotes', // Debe coincidir con el "as" definido en la relación
+                include:[{
+                    model: User,
+                    attributes:['username']
+                }]
             }]
         });
 
@@ -99,7 +114,8 @@ exports.updateIncident = async (req,res) => {
         if (work_note){
             await WorkNote.create({
                 note: work_note,
-                incidentId: incident.id
+                incidentId: incident.id,
+                userId: req.user.id  // el id viene del middleware de autentificación
             });
         }
 
