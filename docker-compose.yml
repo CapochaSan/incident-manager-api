@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: incident-manager-container
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Ayuda a conectar con tu SQL Server local
+    restart: always
+
+# docker-compose up --build
