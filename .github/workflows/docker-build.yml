@@ -1,0 +1,31 @@
+name: Docker Build & Test CI
+
+# 1. ¿Cuando se ejecuta? Cuando hay un push a la rama main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    # 2. ¿En que sistema corre? Usamos ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      # 3. Descarga el código en la VM
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 4. Configura el entorno de Docker
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 5. Intenta construir la imagen sin subirla aún
+      # Esto verifica que el Dockerfile y el código funcionen correctamente
+      - name: Build Docker image
+        run: |
+          docker build -t incident-manager-api:latest .
+      
+      - name: Build Success Message
+        run: echo "¡La imagen se construyó correctamente en el Pipeline!"
