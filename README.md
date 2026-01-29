@@ -23,6 +23,45 @@ Este proyecto es una plataforma integral para el seguimiento de tickets de IT, d
 - `/backend`: API RESTful con arquitectura MVC y modelos relacionales.
 - `docker-compose.yml`: Configuración para levantar todo el entorno con un comando.
 
+---
+
+## 📊 Evidencia de Funcionamiento
+
+El sistema garantiza la persistencia correcta de los datos y el cumplimiento de los esquemas definidos.
+
+![Estructura de la Base de Datos](./img/SQL%20-%20INC.png)
+
+*Ejemplo de registro persistido en SQL Server con numeración automática y timestamps de auditoría.*
+
+![Diseño del login](./img/Login%20-%20front%20.png)
+*Diseño actual del login con protección de rutas.*
+
+![Dashboard de incidentes](./img/Dash%20-%20front.png)
+*Ejemplo de incidentes cargados y presentados en un dasboard con filtros de búsqueda.*
+
+![Detalle de incidente](./img/Incident%20detail.png)
+*Ejemplo de detalle de incidente junto con la maquina de estados y sus respectivas workNotes.*
+
+---
+
+## 🔐 Gestión de Usuarios
+
+Para mantener la seguridad del sistema, el registro de nuevos técnicos se realiza mediante la API.
+
+### Registro de Nuevo Usuario (Postman/cURL)
+**Endpoint:** `POST /api/auth/register`
+
+**Cuerpo de la petición (JSON):**
+```json
+{
+  "username": "nombre_usuario",
+  "password": "tu_password_segura"
+}
+
+El sistema aplicará automáticamente un hash con salt de 10 rondas a la contraseña antes de persistirla en SQL Server.
+
+---
+
 ## 🚀 Instalación Rápida
 1. Clonar: `git clone https://github.com/CapochaSan/incident-manager-api.git`
 2. Configurar `.env` en `/backend` (ver `.env.example`).
