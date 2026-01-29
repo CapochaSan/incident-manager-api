@@ -1,44 +1,33 @@
-# Incident Management API 🛠️
+# 🚀 ITSM Incident Manager: Fullstack Solution
+**Sistema de Gestión de Incidentes con Arquitectura Empresarial**
 
-API RESTful profesional para la gestión de incidentes técnicos, diseñada bajo principios de **Reliability Engineering** y estándares **ITIL**. Este sistema permite la creación, seguimiento y auditoría de tickets de infraestructura, integrando procesos de observabilidad y persistencia de datos empresarial.
+Este proyecto es una plataforma integral para el seguimiento de tickets de IT, diseñada bajo principios de **Reliability Engineering** y estándares **ITIL**. Conecta una interfaz moderna en React con una API robusta en Node.js y persistencia en SQL Server.
 
-## 🚀 Características Principales
-* **Identificación Unívoca (SNOW Style):** Generación automática de tickets incrementales (ej: `INC00000001`) mediante Sequelize Hooks.
-* **Trazabilidad de Auditoría (Activity Stream):** Arquitectura relacional **1:N** que permite asociar múltiples notas de trabajo (`WorkNotes`) a un único incidente, preservando el historial de troubleshooting.
-* **Persistencia Empresarial:** Integración robusta con **SQL Server (MSSQL)** utilizando Sequelize ORM.
-* **Validación de Datos:** Capa de seguridad en modelos para garantizar integridad en severidades (`Critical`, `High`, etc.) y estados (`New`, `In Progress`, `Resolved`).
-* **Seguridad & Autenticación (JWT):** Implementación de JSON Web Tokens para el acceso protegido a rutas críticas y hashing de contraseñas con **bcrypt**.
-* **Filtrado Avanzado (Inner Joins):** Capacidad de filtrar incidentes por severidad, estado o técnico específico que realizó actualizaciones.
+## 🛠️ Ecosistema Tecnológico
+### Frontend (React)
+- **UI Pro:** Componentes dinámicos con estados visuales (New, In Progress, Resolved).
+- **Seguridad:** Rutas protegidas y persistencia de sesión con JWT.
+- **UX:** Navegación fluida y Activity Stream de notas en tiempo real.
 
-## 🛠️ Stack Tecnológico
-* **Backend:** Node.js & Express.
-* **Base de Datos:** SQL Server.
-* **ORM:** Sequelize.
-* **Seguridad:** JWT (JsonWebToken) & bcrypt.js.
-* **Arquitectura:** MVC (Model-View-Controller).
+### Backend (Node.js & Express)
+- **Identificación SNOW Style:** Generación automática de tickets (ej: `INC00000001`).
+- **ORM:** Sequelize gestionando relaciones complejas 1:N con SQL Server.
+- **Seguridad:** Hashing de contraseñas con bcrypt y autenticación JWT.
+
+### Infraestructura & DevOps
+- **Docker:** Orquestación completa mediante Docker Compose.
+- **Database:** Microsoft SQL Server para persistencia de datos empresarial.
 
 ## 📁 Estructura del Proyecto
-Basado en la arquitectura del repositorio:
-- `src/config/db.js`: Configuración de la conexión a MSSQL.
-- `src/controllers/incident.controller.js`: Lógica de negocio y manejo de respuestas HTTP.
-- `src/models/index.js`: Centralizador de modelos y definición de relaciones.
-- `src/models/incident.model.js`: Definición de la entidad principal de incidentes.
-- `src/models/worknote.model.js`: Entidad para el registro cronológico de actualizaciones.
-- `src/routes/incident.routes.js`: Definición de los endpoints protegidos y públicos de la API.
-- `src/middlewares/auth.middleware.js`: Capa de seguridad para validación de tokens.
-- `src/controllers/auth.controller.js`: Lógica de registro y autenticación de técnicos.
+- `/frontend`: Aplicación SPA en React con estilos Enterprise.
+- `/backend`: API RESTful con arquitectura MVC y modelos relacionales.
+- `docker-compose.yml`: Configuración para levantar todo el entorno con un comando.
 
-## 📊 Evidencia de Funcionamiento
-El sistema garantiza la persistencia correcta de los datos y el cumplimiento de los esquemas definidos.
-
-![Estructura de la Base de Datos](./img/SQL%20-%20INC.png)
-*Ejemplo de registro persistido en SQL Server con numeración automática y timestamps de auditoría.*
-
-## ⚙️ Instalación y Configuración
-1. Clonar el repositorio.
-2. Ejecutar `npm install`.
-3. Configurar las credenciales de la base de datos en un archivo `.env`.
-4. Iniciar el servidor con `npm run dev`.
+## 🚀 Instalación Rápida
+1. Clonar: `git clone https://github.com/CapochaSan/incident-manager-api.git`
+2. Configurar `.env` en `/backend` (ver `.env.example`).
+3. Levantar con Docker: docker-compose up --build
+4. Abrir: http://localhost:3001 (Frontend) y http://localhost:3000 (API).
 
 ---
 **Desarrollado por Santiago Vagni** | *Cloud & OS Reliability Engineer | Estudiante de Ingeniería en Sistemas (UTN)*
