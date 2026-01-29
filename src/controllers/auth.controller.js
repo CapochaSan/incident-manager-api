@@ -18,7 +18,7 @@ exports.login = async (req, res) => {
     try{
         const {username, password} = req.body;
         const user = await User.findOne({ where: {username} });
-
+        console.log('login auth controller');
         if (!user)  return res.status(404).json({ error: "Usuario no encontrado"});
 
         // Comparamos la clave ingresada con el hash de la DB

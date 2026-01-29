@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    env_file: ./backend/.env
+    # Nota: El host de la DB en el .env debe ser host.docker.internal para SQL Server local
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3001:80" # Mapeamos el puerto 80 del contenedor al 3001 de tu PC
+    depends_on:
+      - backend
